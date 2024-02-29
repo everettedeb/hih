@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "https://github.com/ipfs/interface-go-ipfs-core/blob/master/iface/core/coreapi/interface.go";
+
+contract DecentralizedFileStorage {
+    struct FileMetadata {
+        address owner;
+        string ipfsHash;
+        uint256 timestamp;
+    }
+
+    mapping(bytes32 => FileMetadata) public fileMetadata;
+
+    event FileStored(address indexed owner, bytes32 indexed fileId, string ipfsHash, uint256 timestamp);
+
+    function storeFile(string memory _ipfsHash) external {
+        bytes32 fileId = keccak256(abi.encodePacked(msg.sender, _ipfsHash, block.timestamp));
+        fileMetadata[fileId] = FileMetadata(msg.sender, _ipfsHash, block.timestamp);
+        emit FileStored(msg.sender, fileId, _ipfsHash, block.timestamp);
+    }
+}
